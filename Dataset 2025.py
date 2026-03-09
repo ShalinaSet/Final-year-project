@@ -8,7 +8,7 @@ if os.path.exists("pub_sales.db"):
     print("  If you want to regenerate, manually delete pub_sales.db first.")
     exit()
 
-# Fixed seed — ensures identical dataset every time this script runs
+# Fixed seed
 np.random.seed(42)
 
 # Create date range
@@ -63,8 +63,8 @@ weather_multiplier = {
 }
 
 # Probabilistic weather per season
-weather_probs = {
-    "winter": [0.15, 0.40, 0.30, 0.15],  # Sunny, Cloudy, Rainy, Cold
+weather_probs = { # Sunny, Cloudy, Rainy, Cold
+    "winter": [0.15, 0.40, 0.30, 0.15],
     "spring": [0.50, 0.25, 0.15, 0.10],
     "summer": [0.45, 0.25, 0.20, 0.10],
     "autumn": [0.25, 0.30, 0.30, 0.15]
@@ -74,10 +74,10 @@ weather_options = ["Sunny", "Cloudy", "Rainy", "Cold"]
 
 # Event boosts
 event_boosts = {
-    "2025-01-01": 1.15,  # New Year's Day
+    "2025-01-01": 1.15,  # New Year
     "2025-10-31": 1.10,  # Halloween
     "2025-12-24": 1.20,  # Christmas Eve
-    "2025-12-25": 1.25,  # Christmas Day
+    "2025-12-25": 1.25,  # Christmas
     "2025-12-26": 1.15   # Boxing Day
 }
 
