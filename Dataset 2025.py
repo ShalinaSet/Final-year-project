@@ -74,11 +74,18 @@ weather_options = ["Sunny", "Cloudy", "Rainy", "Cold"]
 
 # Event boosts
 event_boosts = {
+    "2025-02-14": 1.05,   # Valentine's Day
+    "2025-03-17": 1.10,   # St Patrick's Day
     "2025-01-01": 1.15,  # New Year
     "2025-10-31": 1.10,  # Halloween
-    "2025-12-24": 1.20,  # Christmas Eve
-    "2025-12-25": 1.25,  # Christmas
-    "2025-12-26": 1.15   # Boxing Day
+    "2025-11-05": 1.15,   # Bonfire Night
+    "2025-12-04": 1.20,   # First Christmas party Thursday of December
+    "2025-12-11": 1.25,   # Christmas party peak Thursday
+    "2025-12-12": 1.25,   # Christmas party peak Friday
+    "2025-12-18": 1.30,   # Last big Thursday before Christmas
+    "2025-12-19": 1.30,   # Last big Friday before Christmas
+    "2025-12-24": 0.95,   # Christmas Eve
+    "2025-12-26": 0.95,   # Boxing Day
 }
 
 # Reservation trends

@@ -3,244 +3,235 @@ import numpy as np
 import sqlite3
 import os
 
+# Safety guard — only run once
 if os.path.exists("riverside_pub_sales.db"):
     print("riverside_pub_sales.db already exists — skipping generation.")
     print("Delete the file manually if you want to regenerate.")
     exit()
 
-np.random.seed(99)
+np.random.seed(99)  # fixed seed for reproducibility
 
 print("Generating riverside pub dataset (London, 2025)...")
+print("Seed: 99 | Year: 2025 | 365 days")
+print("-" * 50)
 
 dates = pd.date_range(start="2025-01-01", end="2025-12-31", freq="D")
 
-# sales rule
-
-
+# Sales rules
 sales_rules = {
     1: {
-        "Monday":    (6000,  9000),
-        "Tuesday":   (6000,  9000),
-        "Wednesday": (6500,  9500),
-        "Thursday":  (9000,  13000),
-        "Friday":    (12000, 17000),
-        "Saturday":  (14000, 19000),
-        "Sunday":    (13000, 18000),
+        "Monday":    (4000,  5500),
+        "Tuesday":   (5000,  6500),
+        "Wednesday": (9000,  10500),
+        "Thursday":  (14000, 17000),
+        "Friday":    (15500, 17500),
+        "Saturday":  (4500,  6500),
+        "Sunday":    (3500,  5500),
     },
     2: {
-        "Monday":    (6500,  9500),
-        "Tuesday":   (6500,  9500),
-        "Wednesday": (7000,  10000),
-        "Thursday":  (9500,  13500),
-        "Friday":    (12500, 17500),
-        "Saturday":  (14500, 19500),
-        "Sunday":    (13500, 18500),
+        "Monday":    (4000,  5500),
+        "Tuesday":   (5500,  7000),
+        "Wednesday": (10000, 11500),
+        "Thursday":  (14000, 17000),
+        "Friday":    (15500, 18000),
+        "Saturday":  (4500,  6500),
+        "Sunday":    (3500,  6000),
     },
     3: {
-        "Monday":    (7000,  9000),
-        "Tuesday":   (7000,  10500),
-        "Wednesday": (7500,  11000),
-        "Thursday":  (10500, 15000),
-        "Friday":    (14000, 19000),
-        "Saturday":  (16000, 22000),
-        "Sunday":    (15000, 21000),
+        "Monday":    (4500,  5500),
+        "Tuesday":   (5500,  7000),
+        "Wednesday": (11000, 12500),
+        "Thursday":  (14500, 17500),
+        "Friday":    (16000, 19500),
+        "Saturday":  (6000,  9000),
+        "Sunday":    (5000,  8000),
     },
     4: {
-        "Monday":    (6500,  10000),
-        "Tuesday":   (8000,  12000),
-        "Wednesday": (8500,  12500),
-        "Thursday":  (12000, 17000),
-        "Friday":    (16000, 22000),
-        "Saturday":  (19000, 26000),
-        "Sunday":    (18000, 25000),
+        "Monday":    (5500,  6500),
+        "Tuesday":   (7000,  9000),
+        "Wednesday": (11500, 14500),
+        "Thursday":  (14500, 18500),
+        "Friday":    (17000, 19500),
+        "Saturday":  (6000,  8000),
+        "Sunday":    (4500,  7000),
     },
     5: {
-        "Monday":    (7000,  10000),
-        "Tuesday":   (9000,  13000),
-        "Wednesday": (9500,  13500),
-        "Thursday":  (13000, 18000),
-        "Friday":    (17000, 23000),
-        "Saturday":  (21000, 28000),
-        "Sunday":    (20000, 27000),
+        "Monday":    (5500,  7000),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (12500, 15500),
+        "Thursday":  (14500, 19000),
+        "Friday":    (17000, 20500),
+        "Saturday":  (7000,  9000),
+        "Sunday":    (5500,  7500),
     },
     6: {
-        "Monday":    (6500, 10000),
-        "Tuesday":   (10000, 15000),
-        "Wednesday": (11000, 16000),
+        "Monday":    (5500,  7000),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (13000, 16000),
         "Thursday":  (15000, 21000),
-        "Friday":    (20000, 27000),
-        "Saturday":  (25000, 33000),
-        "Sunday":    (24000, 32000),
+        "Friday":    (17000, 23000),
+        "Saturday":  (7000,  9000),
+        "Sunday":    (6000,  8000),
     },
     7: {
-        "Monday":    (7000, 10000),
-        "Tuesday":   (11000, 16000),
-        "Wednesday": (12000, 17000),
-        "Thursday":  (16000, 22000),
-        "Friday":    (21000, 29000),
-        "Saturday":  (27000, 36000),
-        "Sunday":    (26000, 35000),
+        "Monday":    (6000,  7500),
+        "Tuesday":   (8000,  10500),
+        "Wednesday": (14000, 18000),
+        "Thursday":  (18000, 25000),
+        "Friday":    (20000, 27000),
+        "Saturday":  (7500,  9500),
+        "Sunday":    (6500,  8500),
     },
     8: {
-        "Monday":    (7000, 10500),
-        "Tuesday":   (10500, 15500),
-        "Wednesday": (11500, 16500),
-        "Thursday":  (15500, 21500),
-        "Friday":    (20500, 28000),
-        "Saturday":  (26000, 34000),
-        "Sunday":    (25000, 33000),
+        "Monday":    (5500,  7000),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (12500, 15500),
+        "Thursday":  (14500, 19000),
+        "Friday":    (17000, 20500),
+        "Saturday":  (7500,  9000),
+        "Sunday":    (6500,  8500),
     },
     9: {
-        "Monday":    (6000,  10000),
-        "Tuesday":   (9000,  13500),
-        "Wednesday": (9500,  14000),
-        "Thursday":  (13500, 19000),
-        "Friday":    (18000, 24000),
-        "Saturday":  (22000, 29000),
-        "Sunday":    (21000, 28000),
+        "Monday":    (5500,  7000),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (12500, 15500),
+        "Thursday":  (14500, 19000),
+        "Friday":    (17000, 20500),
+        "Saturday":  (6500,  8500),
+        "Sunday":    (5500,  7500),
     },
     10: {
-        "Monday":    (7500,  10000),
-        "Tuesday":   (8500,  12500),
-        "Wednesday": (9000,  13000),
-        "Thursday":  (12500, 17500),
-        "Friday":    (17000, 23000),
-        "Saturday":  (20000, 27000),
-        "Sunday":    (19000, 26000),
+        "Monday":    (5500,  7000),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (12500, 15500),
+        "Thursday":  (14500, 19000),
+        "Friday":    (17000, 20500),
+        "Saturday":  (6500,  8500),
+        "Sunday":    (5500,  7500),
     },
     11: {
-        "Monday":    (8500,  10000),
-        "Tuesday":   (7500,  11000),
-        "Wednesday": (8000,  11500),
-        "Thursday":  (11000, 15500),
-        "Friday":    (15500, 21000),
-        "Saturday":  (18000, 24000),
-        "Sunday":    (17000, 23000),
+        "Monday":    (5500,  7500),
+        "Tuesday":   (7500,  10000),
+        "Wednesday": (13000, 17500),
+        "Thursday":  (16000, 23000),
+        "Friday":    (18000, 25000),
+        "Saturday":  (7000,  9000),
+        "Sunday":    (6000,  8000),
     },
     12: {
-        "Monday":    (9000, 14000),
-        "Tuesday":   (10000, 15000),
-        "Wednesday": (11000, 16000),
-        "Thursday":  (15000, 21000),
-        "Friday":    (22000, 27000),
-        "Saturday":  (25000, 32000),
-        "Sunday":    (25000, 30000),
+        "Monday":    (6000,  8500),
+        "Tuesday":   (8000,  11000),
+        "Wednesday": (14000, 20000),
+        "Thursday":  (18000, 30000),
+        "Friday":    (20000, 32000),
+        "Saturday":  (9000,  12000),
+        "Sunday":    (7000,  10000),
     },
 }
 
-# London weather — more rain than first pub, less cold
-weather_by_month = {
-    1:  ["Cloudy"] * 12 + ["Rainy"] * 10 + ["Cold"] * 7 + ["Sunny"] * 2,
-    2:  ["Cloudy"] * 11 + ["Rainy"] * 9  + ["Cold"] * 6 + ["Sunny"] * 2,
-    3:  ["Cloudy"] * 12 + ["Rainy"] * 8  + ["Cold"] * 3 + ["Sunny"] * 8,
-    4:  ["Cloudy"] * 10 + ["Rainy"] * 8  + ["Sunny"] * 10 + ["Cold"] * 2,
-    5:  ["Cloudy"] * 9  + ["Rainy"] * 7  + ["Sunny"] * 14,
-    6:  ["Sunny"] * 16  + ["Cloudy"] * 8 + ["Rainy"] * 6,
-    7:  ["Sunny"] * 18  + ["Cloudy"] * 8 + ["Rainy"] * 5,
-    8:  ["Sunny"] * 17  + ["Cloudy"] * 8 + ["Rainy"] * 6,
-    9:  ["Cloudy"] * 12 + ["Sunny"] * 10 + ["Rainy"] * 8,
-    10: ["Cloudy"] * 13 + ["Rainy"] * 10 + ["Sunny"] * 5 + ["Cold"] * 3,
-    11: ["Cloudy"] * 12 + ["Rainy"] * 11 + ["Cold"] * 5 + ["Sunny"] * 2,
-    12: ["Cloudy"] * 11 + ["Rainy"] * 9  + ["Cold"] * 8 + ["Sunny"] * 3,
+# Weather multipliers
+weather_multiplier = {
+    "Sunny": 1.15,
+    "Cloudy": 0.95,
+    "Cold":   1.00,
+    "Rainy":  0.70
 }
 
-# weather multipliers
-weather_multipliers = {
-    "Sunny":  1.18,   # terrace packed, great for riverside
-    "Cloudy": 1.00,   # baseline
-    "Rainy":  0.62,   # terrace empty, much bigger hit than local pub
-    "Cold":   0.88,   # cold but covered areas still used
+# Probabilistic weather per season
+weather_probs = { # Sunny, Cloudy, Rainy, Cold
+    "winter": [0.15, 0.40, 0.30, 0.15],
+    "spring": [0.50, 0.25, 0.15, 0.10],
+    "summer": [0.45, 0.25, 0.20, 0.10],
+    "autumn": [0.25, 0.30, 0.30, 0.15]
 }
 
-# events date
+weather_options = ["Sunny", "Cloudy", "Rainy", "Cold"]
+
+# event dates
 event_multipliers = {
-    "2025-01-01": 1.40,   # New Year's Day
-    "2025-02-14": 1.35,   # Valentine's Day — big for riverside
-    "2025-03-17": 1.25,   # St Patrick's Day
-    "2025-04-18": 1.30,   # Good Friday
-    "2025-04-20": 1.35,   # Easter Sunday
-    "2025-04-21": 1.20,   # Easter Monday
-    "2025-05-05": 1.25,   # Early May bank holiday
-    "2025-05-26": 1.25,   # Spring bank holiday
-    "2025-08-25": 1.30,   # Summer bank holiday
-    "2025-10-31": 1.25,   # Halloween
-    "2025-11-05": 1.20,   # Bonfire Night
-    "2025-12-24": 1.45,   # Christmas Eve — big night out
-    "2025-12-25": 0.40,   # Christmas Day — closed/quiet
-    "2025-12-26": 1.30,   # Boxing Day
-    "2025-12-31": 1.50,   # New Year's Eve — biggest night
+    "2025-01-01": 1.25,   # New Year's Day
+    "2025-02-14": 1.30,   # Valentine's Day
+    "2025-03-17": 1.20,   # St Patrick's Day
+    "2025-04-20": 1.15,   # Easter Sunday
+    "2025-05-01": 1.20,   # Early May bank holiday Thursday
+    "2025-05-08": 1.20,   # Bank holiday Thursday
+    "2025-05-26": 1.15,   # Spring bank holiday
+    "2025-08-25": 1.20,   # Summer bank holiday
+    "2025-10-31": 1.20,   # Halloween
+    "2025-11-05": 1.15,   # Bonfire Night
+    "2025-12-04": 1.20,   # First Christmas party Thursday of December
+    "2025-12-11": 1.25,   # Christmas party peak Thursday
+    "2025-12-12": 1.25,   # Christmas party peak Friday
+    "2025-12-18": 1.30,   # Last big Thursday before Christmas
+    "2025-12-19": 1.30,   # Last big Friday before Christmas
+    "2025-12-24": 1.40,   # Christmas Eve
+    "2025-12-25": 1.45,   # Christmas Day
+    "2025-12-26": 1.25,   # Boxing Day
+    "2025-12-31": 1.45,   # New Year's Eve — biggest night
 }
 
 # generate data
 records = []
 
 for date in dates:
-    month   = date.month
-    weekday = date.strftime("%A")
+    month    = date.month
+    weekday  = date.strftime("%A")
     date_str = str(date.date())
 
-    # base sales from rules
-    low, high = sales_rules[month][weekday]
+    low, high  = sales_rules[month][weekday]
     base_sales = np.random.randint(low, high)
 
-    # weather for the day
-    weather_pool = weather_by_month[month]
-    weather = np.random.choice(weather_pool)
+    # season
+    if month in [12, 1, 2]:
+        season = "winter"
+    elif month in [3, 4, 5]:
+        season = "spring"
+    elif month in [6, 7, 8]:
+        season = "summer"
+    else:
+        season = "autumn"
 
-    # apply weather multiplier
-    sales = base_sales * weather_multipliers[weather]
+    # correct weather selection
+    weather = np.random.choice(weather_options, p=weather_probs[season])
 
-    # apply event multiplier if applicable
+    # correct multiplier usage
+    sales = base_sales * weather_multiplier[weather]
+
+    # event multiplier
     if date_str in event_multipliers:
         sales *= event_multipliers[date_str]
 
-    # add small random noise (±3%)
     noise = np.random.uniform(0.97, 1.03)
     sales = round(sales * noise, 2)
 
-    # reservations — riverside pub books more (higher reservation rate)
-    # roughly 1 reservation per £60 of sales, max 280 covers
-    reservations = min(280, max(15, int(sales / 60) + np.random.randint(-5, 10)))
+    base_res = int(sales / 55)
+    if weekday in ["Thursday", "Friday"] and weather == "Sunny":
+        base_res = int(base_res * 1.4)
+    elif weekday in ["Saturday", "Sunday"] and weather == "Sunny":
+        base_res = int(base_res * 1.2)
+
+    reservations = min(280, max(10, base_res + np.random.randint(-3, 8)))
 
     records.append({
-        "date":         date_str,
-        "weekday":      weekday,
-        "weather":      weather,
+        "date": date_str,
+        "weekday": weekday,
+        "weather": weather,
         "reservations": reservations,
-        "sales_gbp":    sales,
+        "sales_gbp": sales,
     })
 
 riverside_sales = pd.DataFrame(records)
 
-# database saved
 conn = sqlite3.connect("riverside_pub_sales.db")
 riverside_sales.to_sql("daily_sales", conn, if_exists="replace", index=False)
 conn.close()
 
-# save excel sheet
 riverside_sales.to_excel("riverside_pub_sales_2025.xlsx", index=False)
 
-# summary
-print(f"\nDataset generated successfully!")
+print("\nDataset generated successfully!")
 print(f"Total rows      : {len(riverside_sales)}")
 print(f"Date range      : {riverside_sales['date'].min()} to {riverside_sales['date'].max()}")
 print(f"Mean daily sales: £{riverside_sales['sales_gbp'].mean():,.2f}")
 print(f"Min daily sales : £{riverside_sales['sales_gbp'].min():,.2f}")
 print(f"Max daily sales : £{riverside_sales['sales_gbp'].max():,.2f}")
-
-print(f"\nSales by weekday (average):")
-riverside_sales["date_dt"] = pd.to_datetime(riverside_sales["date"])
-dow_avg = riverside_sales.groupby("weekday")["sales_gbp"].mean()
-day_order = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-for day in day_order:
-    print(f"  {day:<12}: £{dow_avg[day]:,.0f}")
-
-print(f"\nWeather distribution:")
-print(riverside_sales["weather"].value_counts().to_string())
-
-print(f"\nTop 5 highest sales days:")
-print(riverside_sales.nlargest(5, "sales_gbp")[["date","weekday","weather","sales_gbp"]].to_string(index=False))
-
-print(f"\nSaved to: riverside_pub_sales.db")
-print(f"Saved to: riverside_pub_sales_2025.xlsx")
 print("\nDone.")

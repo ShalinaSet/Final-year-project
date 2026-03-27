@@ -19,7 +19,7 @@ from pmdarima import auto_arima
 
 warnings.filterwarnings("ignore")
 
-PUB = "local"
+PUB = "local" #Change riverside and local here
 
 
 # Settings per pub — db file, output prefix, seed, events, scenarios
