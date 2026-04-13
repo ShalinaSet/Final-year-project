@@ -3,11 +3,14 @@ import numpy as np
 import sqlite3
 import os
 
-# Safety guard — only run once
-if os.path.exists("riverside_pub_sales.db"):
-    print("riverside_pub_sales.db already exists — skipping generation.")
-    print("Delete the file manually if you want to regenerate.")
-    exit()
+EXCEL_FOLDER = "Excel files"
+DATABASE_FOLDER = "Database"
+RESULTS_FOLDER  = "Results"
+
+os.makedirs(DATABASE_FOLDER, exist_ok=True)
+os.makedirs(EXCEL_FOLDER,    exist_ok=True)
+
+db_path = os.path.join(DATABASE_FOLDER, "riverside_pub_sales.db")
 
 np.random.seed(99)  # fixed seed for reproducibility
 
@@ -222,11 +225,11 @@ for date in dates:
 
 riverside_sales = pd.DataFrame(records)
 
-conn = sqlite3.connect("riverside_pub_sales.db")
+conn = sqlite3.connect(db_path)
 riverside_sales.to_sql("daily_sales", conn, if_exists="replace", index=False)
 conn.close()
 
-riverside_sales.to_excel("riverside_pub_sales_2025.xlsx", index=False)
+riverside_sales.to_excel(os.path.join(EXCEL_FOLDER, "riverside_pub_sales_2025.xlsx"), index=False)
 
 print("\nDataset generated successfully!")
 print(f"Total rows      : {len(riverside_sales)}")
