@@ -3,11 +3,18 @@ import numpy as np
 import sqlite3
 import os
 
-if os.path.exists("pub_sales.db"):
-    print("✓ pub_sales.db already exists — skipping regeneration.")
-    print("  If you want to regenerate, manually delete pub_sales.db first.")
-    exit()
+# Folder paths
+DATABASE_FOLDER = "Database"
+EXCEL_FOLDER    = "Excel files"
+RESULTS_FOLDER  = "Results"
 
+# Create folders if they don't exist yet
+os.makedirs(DATABASE_FOLDER, exist_ok=True)
+os.makedirs(EXCEL_FOLDER,    exist_ok=True)
+os.makedirs(RESULTS_FOLDER,  exist_ok=True)
+
+# File paths
+db_path = os.path.join(DATABASE_FOLDER, "pub_sales.db")
 # Fixed seed
 np.random.seed(42)
 
@@ -142,12 +149,11 @@ print(f"\nSales summary:")
 print(df["sales_gbp"].describe().apply(lambda x: f"£{x:,.2f}"))
 
 # Save to SQLite
-conn = sqlite3.connect("pub_sales.db")
+conn = sqlite3.connect(db_path)
 df.to_sql("daily_sales", conn, if_exists="replace", index=False)
 conn.close()
 print("\n Dataset saved to 'pub_sales.db'")
 
 # Save to Excel
-df.to_excel("daily_sales_2025.xlsx", index=False)
+df.to_excel(os.path.join(EXCEL_FOLDER, "daily_sales_2025.xlsx"), index=False)
 print("Dataset saved to 'daily_sales_2025.xlsx'")
-print("Dataset is now locked. Do not run this script again unless you intentionally want to regenerate — delete pub_sales.db first.")
