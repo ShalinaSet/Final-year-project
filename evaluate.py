@@ -3,6 +3,7 @@ import numpy as np
 import sqlite3
 import matplotlib.pyplot as plt
 import warnings
+import os
 
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -18,6 +19,13 @@ from sklearn.preprocessing import StandardScaler
 from pmdarima import auto_arima
 
 warnings.filterwarnings("ignore")
+DATABASE_FOLDER = "Database"
+EXCEL_FOLDER    = "Excel files"
+RESULTS_FOLDER  = "Results"
+
+os.makedirs(DATABASE_FOLDER, exist_ok=True)
+os.makedirs(EXCEL_FOLDER,    exist_ok=True)
+os.makedirs(RESULTS_FOLDER,  exist_ok=True)
 
 PUB = "riverside" #Change riverside and local here
 
@@ -26,7 +34,7 @@ PUB = "riverside" #Change riverside and local here
 
 PUB_CONFIG = {
     "local": {
-        "db_file":    "pub_sales.db",
+        "db_file":    os.path.join("Database", "pub_sales.db"),
         "pub_name":   "Local Pub",
         "prefix":     "",           # no prefix — keeps original filenames
         "seed":       42,
@@ -47,7 +55,7 @@ PUB_CONFIG = {
         },
     },
     "riverside": {
-        "db_file":    "riverside_pub_sales.db",
+        "db_file":    os.path.join("Database", "riverside_pub_sales.db"),
         "pub_name":   "Riverside Pub (London)",
         "prefix":     "riverside_",
         "seed":       99,
@@ -215,7 +223,7 @@ plot_acf(train_y,  lags=28, ax=axes_acf[0],
 plot_pacf(train_y, lags=28, ax=axes_acf[1],
           title=f"PACF — {cfg['pub_name']} Training Sales (lags=28)\nSignificant lag 1 justifies AR(1) order")
 fig_acf.tight_layout()
-plt.savefig(f"{PREFIX}acf_pacf_plots.png", dpi=150)
+plt.savefig(os.path.join(RESULTS_FOLDER, f"{PREFIX}acf_pacf_plots.png"), dpi=150)
 plt.show()
 print(f"\nSaved: {PREFIX}acf_pacf_plots.png")
 
@@ -401,7 +409,7 @@ ax_fi.set_title(f"Random Forest — Feature Importance ({cfg['pub_name']})\n"
 ax_fi.set_xlabel("Importance Score")
 ax_fi.grid(True, axis="x", alpha=0.4)
 fig_fi.tight_layout()
-plt.savefig(f"{PREFIX}feature_importance_rf.png", dpi=150)
+plt.savefig(os.path.join(RESULTS_FOLDER,f"{PREFIX}feature_importance_rf.png"), dpi=150)
 plt.show()
 print(f"Saved: {PREFIX}feature_importance_rf.png")
 
@@ -462,7 +470,7 @@ print(f"\n{'=' * 60}")
 print(f"MODEL COMPARISON — {cfg['pub_name'].upper()}")
 print(f"{'=' * 60}")
 print(results_daily_sales.to_string(index=False))
-results_daily_sales.to_csv(f"{PREFIX}forecast_model_comparison.csv", index=False)
+results_daily_sales.to_csv(os.path.join(EXCEL_FOLDER, f"{PREFIX}forecast_model_comparison.csv"), index=False)
 print(f"\nSaved: {PREFIX}forecast_model_comparison.csv")
 
 
@@ -537,7 +545,7 @@ ax.set_ylabel("Sales (£)")
 ax.legend(ncol=2)
 ax.grid(True, alpha=0.4)
 fig.tight_layout()
-plt.savefig(f"{PREFIX}forecast_comparison.png", dpi=150)
+plt.savefig(os.path.join(RESULTS_FOLDER,f"{PREFIX}forecast_comparison.png"), dpi=150)
 plt.show()
 print(f"\nSaved: {PREFIX}forecast_comparison.png")
 
@@ -563,7 +571,7 @@ axes[1].set_ylabel("Frequency")
 axes[1].grid(True, alpha=0.4)
 
 fig2.tight_layout()
-plt.savefig(f"{PREFIX}residual_diagnostics.png", dpi=150)
+plt.savefig(os.path.join(RESULTS_FOLDER,f"{PREFIX}residual_diagnostics.png"), dpi=150)
 plt.show()
 print(f"Saved: {PREFIX}residual_diagnostics.png")
 
@@ -639,13 +647,13 @@ for scenario_name, probs in cfg["scenarios"].items():
 daily_sales_out = daily_sales_2026[["date", "weekday", "month"]].copy()
 for sc_name, vals in scenario_forecasts.items():
     daily_sales_out[f"forecast_{sc_name.lower()}_gbp"] = vals
-daily_sales_out.to_excel(f"{PREFIX}forecast_2026_scenarios.xlsx", index=False)
+daily_sales_out.to_excel(os.path.join(EXCEL_FOLDER, f"{PREFIX}forecast_2026_scenarios.xlsx"), index=False)
 print(f"Saved: {PREFIX}forecast_2026_scenarios.xlsx")
 
 # Save neutral scenario — this is what the frontend reads
 daily_sales_neutral = daily_sales_2026[["date", "weekday", "month"]].copy()
 daily_sales_neutral["forecast_sales_gbp"] = scenario_forecasts["Neutral"]
-daily_sales_neutral.to_excel(f"{PREFIX}forecast_2026.xlsx", index=False)
+daily_sales_neutral.to_excel(os.path.join(EXCEL_FOLDER, f"{PREFIX}forecast_2026.xlsx"), index=False)
 print(f"Saved: {PREFIX}forecast_2026.xlsx (Neutral scenario — used by frontend)")
 
 
@@ -684,7 +692,7 @@ ax3.set_ylabel("Average Daily Forecast Sales (£)")
 ax3.legend()
 ax3.grid(True, alpha=0.4)
 fig3.tight_layout()
-plt.savefig(f"{PREFIX}forecast_2026_scenarios.png", dpi=150)
+plt.savefig(os.path.join(RESULTS_FOLDER,f"{PREFIX}forecast_2026_scenarios.png"), dpi=150)
 plt.show()
 print(f"Saved: {PREFIX}forecast_2026_scenarios.png")
 
