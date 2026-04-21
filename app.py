@@ -287,9 +287,9 @@ WEATHER_GRADIENT = {
 }
 
 WEATHER_NOTES = {
-    "Rainy":  "⚠️ Rain forecast — expect ~£2,994 lower sales than average.",
-    "Sunny":  "☀️ Sunny day — slight uplift expected.",
-    "Cold":   "🥶 Cold weather — small boost expected (comfort food effect).",
+    "Rainy":  "⚠️ Rain forecast — lower sales than usual are expected.",
+    "Sunny":  "☀️ Sunny day — higher sales may be expected.",
+    "Cold":   "🥶 Cold weather — a small uplift may occur.",
     "Cloudy": "Typical trading conditions expected.",
 }
 
@@ -701,7 +701,7 @@ with tab_rep:
         lr_rmse = f"£{lr_row['RMSE (£)'].values[0]:,.0f}" if not lr_row.empty else "—"
         ma_mape = f"{ma_row['MAPE (%)'].values[0]:.0f}%" if not ma_row.empty else "—"
         st.markdown(f"- **Random Forest** achieves the best MAPE ({rf_mape}) but is a black box — it cannot explain *why* it predicts a certain value.")
-        st.markdown(f"- **SARIMAX** (MAPE {sarimax_mape}) provides statistically interpretable weather coefficients — e.g. rain reduces daily sales by approximately £2,980. Selected as production model for its interpretability.")
+        st.markdown(f"- **SARIMAX** (MAPE {sarimax_mape}) provides statistically interpretable weather coefficients and was selected as the production model for its interpretability.")
         st.markdown(f"- **Linear Regression** achieves best RMSE ({lr_rmse}) — competitive on smooth, regular demand patterns.")
         st.markdown("- **Decision Tree** is interpretable but less accurate than ensemble methods.")
         st.markdown(f"- **Moving Average** is the naive baseline — its {ma_mape} MAPE shows the value added by all other models.")
@@ -737,7 +737,7 @@ with tab_rep:
         fig_fi2.update_layout(xaxis_title="Importance (%)", showlegend=False,
                               yaxis=dict(autorange="reversed"))
         st.plotly_chart(chart_layout(fig_fi2, 400), use_container_width=True)
-        st.caption("lag_14 (63.97%) and lag_7 (28.63%) account for 92% of predictive power.")
+        st.caption("lag_14 and lag_7 are the strongest predictors, showing that recent weekly sales history carries most of the predictive signal.")
 
 
 # Tab 4 — Settings
@@ -945,4 +945,4 @@ with tab_set:
 | Forecast period | 2026 (Neutral weather scenario) |
 | Framework | Python · Streamlit · statsmodels · scikit-learn · Plotly |
 """)
-    st.caption("BSc Computer Science — Finsal Year Project")
+    st.caption("BSc Computer Science — Final Year Project")
