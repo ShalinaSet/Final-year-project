@@ -34,7 +34,7 @@ The final system includes:
 ### Core files
 
 - `Dataset 2025.py` — generates the local pub dataset  
-- `dataset_riverside_pub_2025.py` — generates the riverside pub dataset  
+- `riverside_dataset.py` — generates the riverside pub dataset  
 - `evaluate.py` — runs all seven models; switch pub at the top of the file  
 - `app.py` — launches the Streamlit frontend  
 
@@ -95,7 +95,7 @@ Run both dataset generators once:
 
 ```bash
 python "Dataset 2025.py"
-python dataset_riverside_pub_2025.py
+python riverside_dataset.py
 ```
 
 These generate:
