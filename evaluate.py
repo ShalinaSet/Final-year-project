@@ -623,6 +623,7 @@ daily_sales_2026["is_event"] = daily_sales_2026["date"].astype(str).isin(
     cfg["event_dates_2026"]).astype(float) * 0.5  # flag known 2026 event dates
 
 scenario_forecasts = {}
+neutral_weather = None
 
 for scenario_name, probs in cfg["scenarios"].items():
     np.random.seed(cfg["seed"])
@@ -636,6 +637,8 @@ for scenario_name, probs in cfg["scenarios"].items():
     daily_sales_s["is_rainy"] = (weather_draw == "Rainy").astype(int)
     daily_sales_s["is_sunny"] = (weather_draw == "Sunny").astype(int)
     daily_sales_s["is_cold"]  = (weather_draw == "Cold").astype(int)
+    if scenario_name == "Neutral":
+        neutral_weather = weather_draw.copy()
 
     sc_exog       = daily_sales_s[exog_cols].astype(float)
     forecast_vals = sarimax_full.forecast(steps=len(sc_exog), exog=sc_exog)
@@ -653,7 +656,17 @@ print(f"Saved: {PREFIX}forecast_2026_scenarios.xlsx")
 # Save neutral scenario — this is what the frontend reads
 daily_sales_neutral = daily_sales_2026[["date", "weekday", "month"]].copy()
 daily_sales_neutral["forecast_sales_gbp"] = scenario_forecasts["Neutral"]
-daily_sales_neutral.to_excel(os.path.join(EXCEL_FOLDER, f"{PREFIX}forecast_2026.xlsx"), index=False)
+
+if neutral_weather is not None:
+    daily_sales_neutral["weather"] = neutral_weather
+    daily_sales_neutral["is_rainy"] = (daily_sales_neutral["weather"] == "Rainy").astype(int)
+    daily_sales_neutral["is_sunny"] = (daily_sales_neutral["weather"] == "Sunny").astype(int)
+    daily_sales_neutral["is_cold"] = (daily_sales_neutral["weather"] == "Cold").astype(int)
+
+daily_sales_neutral.to_excel(
+    os.path.join(EXCEL_FOLDER, f"{PREFIX}forecast_2026.xlsx"),
+    index=False
+)
 print(f"Saved: {PREFIX}forecast_2026.xlsx (Neutral scenario — used by frontend)")
 
 
